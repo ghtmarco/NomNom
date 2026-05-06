@@ -1,90 +1,75 @@
-# 🍎 NomNom
+# NomNom: Food & Recipes for Android
 
-NomNom is a modern, high-performance Android application designed for food discovery and nutritional tracking. Built with **Jetpack Compose** and following **Clean Architecture** principles, it provides users with a seamless experience for searching foods and discovering curated recipes with detailed nutritional insights.
+NomNom helps you find what's in your food. Search for ingredients, browse recipes, and get nutritional data without the fluff. Built with Jetpack Compose and a focus on clean, testable code.
 
-[![Android](https://img.shields.io/badge/Platform-Android-green.svg?style=for-the-badge&logo=android)](https://www.android.com/)
-[![Kotlin](https://img.shields.io/badge/Language-Kotlin-orange.svg?style=for-the-badge&logo=kotlin)](https://kotlinlang.org/)
-[![Compose](https://img.shields.io/badge/UI-Jetpack_Compose-blue.svg?style=for-the-badge&logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
-
----
-
-## ✨ Features
-
-- 🔍 **Universal Search**: Find any food item with instant nutritional breakdowns.
-- 👨‍🍳 **Curated Recipes**: Discover healthy and delicious recipes with step-by-step guides.
-- 📊 **Nutrition Analysis**: Detailed tracking of Calories, Protein, Carbs, and Fats.
-- 🚀 **Modern UI**: Fully built with Jetpack Compose and Material 3 for a fluid, premium feel.
-- 🛡️ **Secure Architecture**: Abstracted secrets and production-hardened networking.
+[![Android](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)](https://www.android.com/)
+[![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Compose](https://img.shields.io/badge/UI-Compose-4285F4?style=flat-square&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
 
 ---
 
-## 📸 Screenshots
+## What it does
+
+- **Food Search**: Get calories, protein, carbs, and fats for almost anything.
+- **Recipe Discovery**: A curated list of recipes with full nutritional breakdowns.
+- **Clean UI**: No cluttered menus. Just a simple, Material 3 interface that gets out of your way.
+
+---
+
+## Screenshots
 
 <p align="center">
-  <img src="screenshots/SplashScreen.png.png" width="200" title="Splash Screen">
-  <img src="screenshots/HomeScreen.png.png" width="200" title="Home Screen">
-  <img src="screenshots/SearchScreen.png.png" width="200" title="Search Screen">
-  <img src="screenshots/DetailScreen.png.png" width="200" title="Detail Screen">
+  <img src="screenshots/SplashScreen.png.png" width="200" alt="Splash">
+  <img src="screenshots/HomeScreen.png.png" width="200" alt="Home">
+  <img src="screenshots/SearchScreen.png.png" width="200" alt="Search">
+  <img src="screenshots/DetailScreen.png.png" width="200" alt="Detail">
 </p>
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+## Tech Stack
 
-This project follows **Clean Architecture** (UI -> ViewModel -> Repository -> Data Source) and uses a **TDD (Test-Driven Development)** workflow to ensure reliability.
+I built this using a Clean Architecture approach to keep the UI separate from the data logic. It's easier to test and maintain this way.
 
-### 🛠️ Core Technologies
-- **UI Framework**: [Jetpack Compose](https://developer.android.com/jetpack/compose) with Material 3.
-- **Dependency Management**: Gradle Version Catalog (libs.versions.toml).
-- **Networking**: [Retrofit](https://square.github.io/retrofit/) & [OkHttp](https://square.github.io/okhttp/) with Logging Interceptor.
-- **Asynchronous Flow**: Kotlin Coroutines & StateFlow.
-- **Image Loading**: [Coil](https://coil-kt.github.io/coil/) (Coroutine Image Loader).
-- **Testing**: [JUnit](https://junit.org/junit4/) & [MockK](https://mockk.io/) for robust unit testing.
+- **Frontend**: Jetpack Compose with Material 3.
+- **Networking**: Retrofit and OkHttp.
+- **Architecture**: MVVM with a Repository pattern.
+- **Images**: Coil for async image loading.
+- **Testing**: JUnit and MockK (unit tests cover the repository and formatting logic).
 
-### 📐 Structural Diagram
 ```mermaid
-graph TD
-    UI[Jetpack Compose UI] --> VM[ViewModel]
-    VM --> Repo[Food Repository]
-    Repo --> API[FatSecret API Service]
-    Repo --> Formatter[Nutrition Formatter]
+graph LR
+    UI[Compose UI] --> VM[ViewModel]
+    VM --> Repo[Repository]
+    Repo --> API[FatSecret API]
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### Prerequisites
-- Android Studio Jellyfish or newer.
-- JDK 17.
-- [FatSecret API](https://platform.fatsecret.com/) Credentials.
+### 1. API Keys
+You'll need a developer account at [FatSecret Platform](https://platform.fatsecret.com/). 
 
-### Setup
-1. Clone the repository.
-2. Open `local.properties` and add your API keys:
-   ```properties
-   fatsecret.consumer.key=YOUR_CONSUMER_KEY
-   fatsecret.consumer.secret=YOUR_CONSUMER_SECRET
-   ```
-3. Build and Run the app.
+### 2. Configuration
+Add your keys to `local.properties` in the root directory:
+```properties
+fatsecret.consumer.key=your_key_here
+fatsecret.consumer.secret=your_secret_here
+```
+
+### 3. Build
+Open in Android Studio (Jellyfish+) and hit run. Make sure you're using JDK 17.
 
 ---
 
-## 🧪 Running Tests
+## Development
 
-To run the unit test suite and verify architectural integrity:
+The project follows a TDD workflow. You can run the tests with:
 ```bash
-./gradlew testDebugUnitTest
+./gradlew test
 ```
 
 ---
 
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<p align="center">
-  Made with ❤️ by Asphyxia & Antigravity
-</p>
+Made by Asphyxia & Antigravity
