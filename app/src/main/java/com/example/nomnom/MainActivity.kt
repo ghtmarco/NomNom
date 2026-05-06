@@ -13,8 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nomnom.data.FoodRepository
+import com.example.nomnom.`interface`.ApiClient
 import com.example.nomnom.fragment.ProductScreen
 import com.example.nomnom.fragment.SearchScreen
+import com.example.nomnom.ui.product.ProductViewModel
+import com.example.nomnom.ui.product.ProductViewModelFactory
+import com.example.nomnom.ui.search.SearchViewModel
+import com.example.nomnom.ui.search.SearchViewModelFactory
 import com.example.nomnom.ui.theme.NomNomTheme
 import com.example.nomnom.ui.theme.PrimaryColor
 
@@ -43,6 +50,14 @@ fun MainScreen() {
     var selectedNavItem by remember { mutableStateOf(BottomNavItem.Home) }
     var showSearch by remember { mutableStateOf(false) }
 
+    val repository = remember { FoodRepository(ApiClient.api) }
+    val productViewModel: ProductViewModel = viewModel(
+        factory = ProductViewModelFactory(repository)
+    )
+    val searchViewModel: SearchViewModel = viewModel(
+        factory = SearchViewModelFactory(repository)
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -63,11 +78,13 @@ fun MainScreen() {
     ) { innerPadding ->
         if (showSearch) {
             SearchScreen(
+                viewModel = searchViewModel,
                 modifier = Modifier.padding(innerPadding),
                 onBackToHome = { showSearch = false }
             )
         } else {
             ProductScreen(
+                viewModel = productViewModel,
                 modifier = Modifier.padding(innerPadding),
                 onSearchClick = { showSearch = true }
             )

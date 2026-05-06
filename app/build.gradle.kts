@@ -1,6 +1,9 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -18,27 +21,37 @@ android {
     }
 
     buildTypes {
+        debug {
+            val properties = Properties()
+            val localPropertiesFile = project.rootProject.file("local.properties")
+            if (localPropertiesFile.exists()) {
+                localPropertiesFile.inputStream().use { properties.load(it) }
+            }
+            buildConfigField("String", "FATSECRET_CONSUMER_KEY", "\"${properties.getProperty("fatsecret.consumer.key")}\"")
+            buildConfigField("String", "FATSECRET_CONSUMER_SECRET", "\"${properties.getProperty("fatsecret.consumer.secret")}\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Use placeholders for release if keys are not in local.properties
+            buildConfigField("String", "FATSECRET_CONSUMER_KEY", "\"\"")
+            buildConfigField("String", "FATSECRET_CONSUMER_SECRET", "\"\"")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         viewBinding = true
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        buildConfig = true
     }
 }
 
@@ -83,6 +96,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
     
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -1,5 +1,6 @@
 package com.example.nomnom.`interface`
 
+import com.example.nomnom.BuildConfig
 import com.example.nomnom.interceptor.OAuthInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -8,11 +9,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
     private const val BASE_URL = "https://platform.fatsecret.com/"
-    private const val CONSUMER_KEY = "ee5eb44ffc054ba18a8667068d1c6280"
-    private const val CONSUMER_SECRET = "545357baca0b42a8a175807d1e4b070f"
+    private val CONSUMER_KEY = BuildConfig.FATSECRET_CONSUMER_KEY
+    private val CONSUMER_SECRET = BuildConfig.FATSECRET_CONSUMER_SECRET
 
     private val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
     }
 
     private val oauthInterceptor = OAuthInterceptor(CONSUMER_KEY, CONSUMER_SECRET)

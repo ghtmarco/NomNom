@@ -21,58 +21,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.nomnom.DetailsActivity
-import com.example.nomnom.model.*
-import com.example.nomnom.`interface`.ApiClient
-import com.example.nomnom.ui.components.*
+import com.example.nomnom.ui.search.SearchViewModel
+import com.example.nomnom.ui.search.SearchUiState
 import com.example.nomnom.ui.theme.*
-import kotlinx.coroutines.launch
+import com.example.nomnom.ui.components.*
+import com.example.nomnom.model.*
+import com.example.nomnom.DetailsActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
+    viewModel: SearchViewModel,
     modifier: Modifier = Modifier,
     onBackToHome: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var foods by remember { mutableStateOf<List<FoodData>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    val uiState by viewModel.uiState.collectAsState()
+    
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    fun searchFoods(query: String) {
-        if (query.trim().isNotEmpty()) {
-            isLoading = true
-            error = null
-            coroutineScope.launch {
-                try {
-                    val response = ApiClient.api.searchFoods(query = query.trim())
-                    if (response.isSuccessful) {
-                        val foodItems = response.body()?.foods?.food ?: emptyList()
-                        val foodDataList = foodItems.map { foodItem ->
-                            FoodData(
-                                id = foodItem.food_id,
-                                name = foodItem.food_name,
-                                brandName = foodItem.brand_name,
-                                imageUrl = null,
-                                calories = null,
-                                nutrition = null
-                            )
-                        }
-                        foods = foodDataList
-                    } else {
-                        error = "Search failed: ${response.message()}"
-                    }
-                } catch (e: Exception) {
-                    error = "Network error: ${e.message}"
-                } finally {
-                    isLoading = false
-                }
-            }
-        }
-    }
+    val foods = (uiState as? SearchUiState.Success)?.foods ?: emptyList()
+    val isLoading = uiState is SearchUiState.Loading
+    val error = (uiState as? SearchUiState.Error)?.message
 
     Column(
         modifier = modifier
@@ -128,8 +99,6 @@ fun SearchScreen(
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = {
                             searchQuery = ""
-                            foods = emptyList()
-                            error = null
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
@@ -147,7 +116,7 @@ fun SearchScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        searchFoods(searchQuery)
+                        viewModel.searchFoods(searchQuery)
                         keyboardController?.hide()
                     }
                 ),

@@ -29,7 +29,14 @@ import coil.compose.AsyncImage
 import com.example.nomnom.R
 import com.example.nomnom.model.*
 import com.example.nomnom.`interface`.ApiClient
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nomnom.data.FoodRepository
+import com.example.nomnom.ui.details.DetailsUiState
+import com.example.nomnom.ui.details.DetailsViewModel
+import com.example.nomnom.ui.details.DetailsViewModelFactory
+import com.example.nomnom.util.NutritionFormatter
 import com.example.nomnom.ui.components.CustomButton
+import com.example.nomnom.ui.theme.Blue
 import com.example.nomnom.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -54,12 +61,18 @@ class DetailsActivity : ComponentActivity() {
 
         setContent {
             NomNomTheme {
+                val repository = remember { FoodRepository(ApiClient.api) }
+                val viewModel: DetailsViewModel = viewModel(
+                    factory = DetailsViewModelFactory(repository)
+                )
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     if (isRecipe) {
                         RecipeDetailsScreen(
+                            viewModel = viewModel,
                             recipeId = recipeId,
                             foodName = foodName,
                             imageUrl = imageUrl,
@@ -73,6 +86,7 @@ class DetailsActivity : ComponentActivity() {
                         )
                     } else {
                         FoodDetailsScreen(
+                            viewModel = viewModel,
                             foodId = foodId ?: "",
                             foodName = foodName,
                             brandName = brandName,
@@ -87,32 +101,21 @@ class DetailsActivity : ComponentActivity() {
 
 @Composable
 fun FoodDetailsScreen(
+    viewModel: DetailsViewModel,
     foodId: String,
     foodName: String,
     brandName: String?,
     onBackPressed: () -> Unit
 ) {
-    var foodDetail by remember { mutableStateOf<FoodDetail?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
-    val coroutineScope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(foodId) {
-        coroutineScope.launch {
-            try {
-                val response = ApiClient.api.getFoodDetail(foodId = foodId)
-                if (response.isSuccessful) {
-                    foodDetail = response.body()?.food
-                } else {
-                    error = "Failed to load food details"
-                }
-            } catch (e: Exception) {
-                error = "Network error: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
+        viewModel.getFoodDetail(foodId)
     }
+
+    val foodDetail = (uiState as? DetailsUiState.Success)?.food?.food
+    val isLoading = uiState is DetailsUiState.Loading
+    val error = (uiState as? DetailsUiState.Error)?.message
 
     when {
         isLoading -> {
@@ -295,6 +298,7 @@ fun FoodDetailContent(
 
 @Composable
 fun RecipeDetailsScreen(
+    viewModel: DetailsViewModel,
     recipeId: String?,
     foodName: String,
     imageUrl: String?,
@@ -306,30 +310,34 @@ fun RecipeDetailsScreen(
     fat: String?,
     onBackPressed: () -> Unit
 ) {
-    var fullRecipe by remember { mutableStateOf<Recipe?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(recipeId) {
         if (!recipeId.isNullOrEmpty()) {
-            coroutineScope.launch {
-                try {
-                    isLoading = true
-                    val response = ApiClient.api.getRecipe(recipeId = recipeId)
-                    if (response.isSuccessful) {
-                        fullRecipe = response.body()?.recipe
-                    }
-                } catch (e: Exception) {
-                } finally {
-                    isLoading = false
-                }
-            }
+            viewModel.getRecipe(recipeId)
         }
     }
+
+    val fullRecipe = (uiState as? DetailsUiState.Success)?.recipe?.recipe
+    val isLoading = uiState is DetailsUiState.Loading
+    val error = (uiState as? DetailsUiState.Error)?.message
 
     val scrollState = rememberScrollState()
 
     Box(modifier = Modifier.fillMaxSize()) {
+        if (error != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "Error: $error", color = Color.Red)
+                    Button(onClick = { if (!recipeId.isNullOrEmpty()) viewModel.getRecipe(recipeId) }) {
+                        Text("Retry")
+                    }
+                }
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -558,11 +566,11 @@ fun RecipeNutritionGrid(
     protein: String?,
     fat: String?
 ) {
-    val nutritionItems = listOfNotNull(
-        calories?.let { "Calories" to it },
-        carbs?.let { "Carbs" to "${it}g" },
-        protein?.let { "Protein" to "${it}g" },
-        fat?.let { "Fat" to "${it}g" }
+    val nutritionItems = listOf(
+        "Calories" to NutritionFormatter.formatCalories(calories),
+        "Carbs" to NutritionFormatter.formatGram(carbs),
+        "Protein" to NutritionFormatter.formatGram(protein),
+        "Fat" to NutritionFormatter.formatGram(fat)
     )
 
     Column {

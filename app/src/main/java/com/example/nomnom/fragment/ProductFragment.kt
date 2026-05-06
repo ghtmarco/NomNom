@@ -27,89 +27,25 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
+import com.example.nomnom.ui.product.ProductViewModel
+import com.example.nomnom.ui.product.ProductUiState
+
 @Composable
 fun ProductScreen(
+    viewModel: ProductViewModel,
     modifier: Modifier = Modifier,
     onSearchClick: () -> Unit
 ) {
-    var recipes by remember { mutableStateOf<List<RecipeData>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    val targetRecipes = listOf(
-        "Mustard Crusted Steak",
-        "Balsamic Salmon",
-        "Baked Salmon",
-        "Basil Chicken Primavera",
-        "Spinach Feta Pasta Shrimp",
-        "Hibiscus Tea",
-        "Oatmeal Chocolate Chip Cookies",
-        "Protein Shake",
-        "Bang Bang Shrimp Salad",
-        "Buffalo Chicken Flatbread"
-    )
-
-    fun loadRecipes() {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-
-                val searchTasks = targetRecipes.map { searchTerm ->
-                    async {
-                        try {
-                            val response = ApiClient.api.searchRecipes(
-                                query = searchTerm,
-                                region = "US",
-                                maxResults = 3
-                            )
-                            if (response.isSuccessful) {
-                                response.body()?.recipes?.recipe?.firstOrNull()
-                            } else null
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }
-                }
-
-                val results = searchTasks.awaitAll().filterNotNull()
-
-                val recipeDataList = results.map { recipeItem ->
-                    RecipeData(
-                        id = recipeItem.recipe_id,
-                        name = recipeItem.recipe_name,
-                        description = recipeItem.recipe_description,
-                        prepTime = null,
-                        cookTime = null,
-                        totalTime = "~30 min",
-                        imageUrl = recipeItem.recipe_image?.takeIf { it.isNotBlank() },
-                        nutrition = recipeItem.recipe_nutrition,
-                        servings = null,
-                        rating = null,
-                        ingredients = null,
-                        directions = null
-                    )
-                }
-
-                recipes = recipeDataList
-
-                if (recipes.isEmpty()) {
-                    error = "No recipes found. Please check your connection."
-                }
-
-            } catch (e: Exception) {
-                error = "Network error: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
 
     LaunchedEffect(key1 = Unit) {
-        loadRecipes()
+        viewModel.loadRecipes()
     }
+
+    val recipes = (uiState as? ProductUiState.Success)?.recipes ?: emptyList()
+    val isLoading = uiState is ProductUiState.Loading
+    val error = (uiState as? ProductUiState.Error)?.message
 
     Column(
         modifier = modifier
@@ -216,7 +152,7 @@ fun ProductScreen(
                             Spacer(modifier = Modifier.height(24.dp))
                             CustomButton(
                                 text = "Try Again",
-                                onClick = { loadRecipes() },
+                                onClick = { viewModel.loadRecipes() },
                                 icon = Icons.Default.Refresh
                             )
                         }
