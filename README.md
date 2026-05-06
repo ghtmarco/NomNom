@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="screenshots/logo.png" width="128" alt="NomNom Logo">
+</p>
+
 # NomNom: Food & Recipes for Android
 
 NomNom helps you find what's in your food. Search for ingredients, browse recipes, and get nutritional data without the fluff. Built with Jetpack Compose and a focus on clean, testable code.
