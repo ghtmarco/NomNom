@@ -4,6 +4,8 @@
 
 # NomNom: Food & Recipes for Android
 
+*Note: This application was built as a collaborative group project for the **MOBI6006001 - LEC** course at **Binus University**.*
+
 NomNom helps you find what's in your food. Search for ingredients, browse recipes, and get nutritional data without the fluff. Built with Jetpack Compose and a focus on clean, testable code.
 
 [![Android](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)](https://www.android.com/)
