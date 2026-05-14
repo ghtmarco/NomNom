@@ -4,9 +4,9 @@
 
 # NomNom: Food & Recipes for Android
 
-*Note: This application was built as a collaborative group project for the **MOBI6006001 - LEC** course at **Binus University**.*
+*Built as a group project for **MOBI6006001 - LEC** at **Binus University**.*
 
-NomNom helps you find what's in your food. Search for ingredients, browse recipes, and get nutritional data without the fluff. Built with Jetpack Compose and a focus on clean, testable code.
+NomNom lets you look up what's in your food. Search for ingredients, browse recipes, get nutritional data. Built with Jetpack Compose.
 
 [![Android](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)](https://www.android.com/)
 [![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
@@ -16,9 +16,9 @@ NomNom helps you find what's in your food. Search for ingredients, browse recipe
 
 ## What it does
 
-- **Food Search**: Get calories, protein, carbs, and fats for almost anything.
-- **Recipe Discovery**: A curated list of recipes with full nutritional breakdowns.
-- **Clean UI**: No cluttered menus. Just a simple, Material 3 interface that gets out of your way.
+- **Food Search**: Calories, protein, carbs, and fats for almost any ingredient.
+- **Recipe Discovery**: Recipes with full nutritional breakdowns.
+- **Clean UI**: Material 3, nothing extra.
 
 ---
 
@@ -35,7 +35,7 @@ NomNom helps you find what's in your food. Search for ingredients, browse recipe
 
 ## Tech Stack
 
-I built this using a Clean Architecture approach to keep the UI separate from the data logic. It's easier to test and maintain this way.
+I structured this around Clean Architecture to keep the UI layer separate from data access — makes unit testing a lot more straightforward.
 
 - **Frontend**: Jetpack Compose with Material 3.
 - **Networking**: Retrofit and OkHttp.
@@ -55,7 +55,7 @@ graph LR
 ## Getting Started
 
 ### 1. API Keys
-You'll need a developer account at [FatSecret Platform](https://platform.fatsecret.com/). 
+You'll need a developer account at [FatSecret Platform](https://platform.fatsecret.com/).
 
 ### 2. Configuration
 Add your keys to `local.properties` in the root directory:
@@ -71,11 +71,7 @@ Open in Android Studio (Jellyfish+) and hit run. Make sure you're using JDK 17.
 
 ## Development
 
-The project follows a TDD workflow. You can run the tests with:
+Tests run with:
 ```bash
 ./gradlew test
 ```
-
----
-
-Made by Asphyxia & Antigravity
